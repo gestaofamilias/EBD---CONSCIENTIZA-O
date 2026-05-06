@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EBD - Prioridade ou Opção?</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --color-bg-base: #0a0d14;
+            --color-bg-slide: #10131f;
+            --color-panel: #0b0d17;
+            --color-panel-light: #181d2e;
+            --color-gold: #c6a052;
+            --color-gold-hover: #daba73;
+            --color-text-white: #ffffff;
+            --color-text-muted: #a0a4b8;
+            --color-text-dark: #cbd5e1;
+            
+            --font-serif: 'Merriweather', serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        /* 1. THE SETUP */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--color-bg-base);
+            display: grid;
+            gap: 30px;
+            grid-template-columns: 1fr;
+            min-height: 100vh;
+            padding: 30px 0;
+            place-items: center;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-container {
+            background-color: var(--color-bg-slide);
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 50px rgba(198, 160, 82, 0.15);
+            display: flex;
+            flex-direction: column;
+            font-family: var(--font-sans);
+            height: 720px;
+            justify-content: center;
+            overflow: hidden;
+            padding: 60px;
+            position: relative;
+            width: 1280px;
+            border: 1px solid rgba(198, 160, 82, 0.2);
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* 1.1 BACKGROUND GRID & GRADIENT STYLING */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(198, 160, 82, 0.03) 0%, transparent 60%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .slide-container > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 2. CONSISTENT TYPOGRAPHY */
+        .slide-container h1,
+        .slide-container h2,
+        .slide-container h3,
+        .slide-container .number {
+            font-family: var(--font-serif);
+            color: var(--color-text-white);
+        }
+
+        .slide-container p,
+        .slide-container li,
+        .slide-container .label {
+            font-family: var(--font-sans);
+            color: var(--color-text-muted);
+        }
+
+        p { margin-bottom: 15px; }
+
+        /* General Slide Titles */
+        .slide-container .slide-title {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: left;
+            width: 100%;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .slide-container .slide-title .gold-text {
+            background: linear-gradient(to right, var(--color-gold), #e8d08c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--color-gold);
+        }
+
+        /* 3. SLIDE 1: MASTER LAYOUT STYLES */
+        .slide-header-absolute {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 10;
+        }
+
+        .badge-left {
+            border: 1px solid var(--color-gold);
+            border-radius: 30px;
+            color: var(--color-gold);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            padding: 8px 20px;
+            text-transform: uppercase;
+        }
+
+        .badge-right {
+            text-align: right;
+        }
+        
+        .badge-right .number {
+            color: var(--color-gold);
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1;
+        }
+        
+        .badge-right .label {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .main-title-area {
+            text-align: left;
+            width: 100%;
+            margin-top: -40px;
+        }
+
+        .main-title-area h1 {
+            font-size: 80px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .gold-underline {
+            color: var(--color-gold);
+            border-bottom: 6px solid var(--color-gold);
+            padding-bottom: 4px;
+            display: inline-block;
+        }
+
+        .main-subtitle {
+            color: var(--color-text-muted);
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .main-sub-subtitle {
+            color: var(--color-text-dark);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .gold-pipe {
+            color: var(--color-gold);
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        /* Abstract Graphic Cross */
+        .graphic-cross-container {
+            position: absolute;
+            right: 120px;
+            top: 45%;
+            transform: translateY(-50%);
+            width: 320px;
+            height: 320px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+
+        .graphic-cross-container::before {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+
+        .cross {
+            position: relative;
+            width: 36px;
+            height: 36px;
+        }
+
+        .cross::before, .cross::after {
+            content: '';
+            position: absolute;
+            background-color: var(--color-gold);
+            border-radius: 4px;
+            opacity: 0.8;
+        }
+
+        .cross::before { top: 0; left: 14px; width: 8px; height: 36px; }
+        .cross::after { top: 14px; left: 0; width: 36px; height: 8px; }
+
+        /* Modern Quote Box */
+        .modern-quote-box {
+            background-color: rgba(11, 13, 23, 0.7);
+            backdrop-filter: blur(12px);
+            border-left: 4px solid var(--color-gold);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 30px 40px;
+            border-radius: 0 12px 12px 0;
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modern-quote-box.absolute-bottom {
+            position: absolute;
+            bottom: 40px;
+            left: 60px;
+            width: calc(100% - 120px);
+            z-index: 10;
+        }
+
+        .modern-quote-box p {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 26px;
+            color: var(--color-text-white);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .modern-quote-box cite {
+            font-family: var(--font-sans);
+            color: var(--color-gold);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-style: normal;
+        }
+
+        .modern-quote-box cite::before {
+            content: '— ';
+        }
+
+        /* 4. CONTENT LAYOUTS */
+        .content-area {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .two-column {
+            align-items: flex-start;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            width: 100%;
+        }
+
+        .two-column p, .two-column li {
+            font-size: 20px;
+            line-height: 1.6;
+        }
+
+        .two-column ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        .two-column ul li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .two-column ul li::before {
+            content: '•';
+            color: var(--color-gold);
+            position: absolute;
+            left: 0;
+            font-size: 24px;
+            top: -5px;
+        }
+
+        .two-column ul li strong {
+            color: var(--color-text-white);
+            font-weight: 600;
+        }
+
+        /* Tiled Content */
+        .two-column.tiled { align-items: stretch; }
+        .two-column.tiled > div {
+            background-color: var(--color-panel-light);
+            border-radius: 8px;
+            border-left: 3px solid var(--color-gold);
+            padding: 35px;
+            text-align: left;
+        }
+        .two-column.tiled h3 {
+            color: var(--color-text-white);
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .tiled-content {
+            align-items: stretch;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            width: 100%;
+        }
+        .tile {
+            background-color: var(--color-panel-light);
+            border-top: 3px solid var(--color-gold);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .tile .icon {
+            color: var(--color-gold);
+            font-size: 48px;
+            margin-bottom: 25px;
+        }
+        .tile h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        /* Bullet List with Icons */
+        .bullet-list { width: 100%; }
+        .bullet-list ul { list-style: none; padding: 0; }
+        .bullet-list li {
+            font-size: 22px;
+            margin-bottom: 25px;
+            padding-left: 50px;
+            position: relative;
+            line-height: 1.5;
+        }
+        .bullet-list i {
+            color: var(--color-gold);
+            font-size: 24px;
+            left: 0;
+            position: absolute;
+            top: 5px;
+        }
+        .bullet-list li strong { color: var(--color-text-white); }
+
+        /* Highlight Numbers Layout */
+        .highlight-numbers-layout { align-items: center; }
+        .highlight-numbers-layout > div:first-child {
+            text-align: center;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            padding-right: 40px;
+        }
+        .highlight-numbers-layout .number {
+            color: var(--color-gold);
+            font-size: 160px;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .highlight-numbers-layout .number-label {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            margin-top: 15px;
+        }
+        .highlight-numbers-layout h3 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        /* Images */
+        .image-wrapper {
+            border-radius: 12px;
+            height: 400px;
+            overflow: hidden;
+            width: 100%;
+            border: 1px solid rgba(198, 160, 82, 0.3);
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 20px rgba(198, 160, 82, 0.15);
+        }
+        .image-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(10,13,20,0.7) 0%, transparent 60%);
+            pointer-events: none;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .image-wrapper img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            filter: contrast(1.1) brightness(0.9);
+            transition: transform 0.5s ease;
+        }
+        .slide-container:hover .image-wrapper img {
+            transform: scale(1.05);
+        }
+
+        /* Bleed Image Layout */
+        .slide-container.bleed-image-layout {
+            align-items: start;
+            display: grid;
+            gap: 60px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            padding: 0;
+        }
+        .slide-container.bleed-image-layout > .content-container {
+            padding: 60px 0 60px 60px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .slide-container.bleed-image-layout > .image-container {
+            height: 100%;
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+        }
+        .slide-container.bleed-image-layout > .image-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, var(--color-bg-slide) 0%, transparent 30%);
+            z-index: 2;
+        }
+        .slide-container.bleed-image-layout img.bleed-image-side {
+            display: block;
+            height: 720px;
+            object-fit: cover;
+            width: 100%;
+            filter: grayscale(30%) contrast(1.1);
+        }
+        .bleed-text-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .bleed-text-side h3 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: var(--color-gold);
+        }
+
+        /* Q&A / Final Slide */
+        .qa-layout { text-align: center; width: 100%; }
+        .qa-layout h2 { font-size: 64px; margin-bottom: 30px; }
+        .qa-layout p { font-size: 28px; color: var(--color-text-white); margin-bottom: 15px; font-weight: 500;}
+        .qa-layout .contact-info {
+            color: var(--color-bg-base);
+            font-size: 24px;
+            margin-top: 50px;
+            font-weight: 700;
+            background-color: var(--color-gold);
+            padding: 15px 40px;
+            border-radius: 50px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Custom emphasis boxes */
+        .emphasis-box {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: rgba(198, 160, 82, 0.05);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--color-gold);
+            border: 1px solid rgba(198, 160, 82, 0.2);
+            border-left: 4px solid var(--color-gold);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .emphasis-box h3, .emphasis-box p.highlight-text {
+            color: var(--color-text-white);
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .emphasis-box .gold-text { color: var(--color-gold); }
+
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Master Title Slide -->
+<div class="slide-container" id="slide1">
+    <div class="slide-header-absolute">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+        <div class="badge-right">
+            <span class="number">50+</span><br>
+            <span class="label">Alunos na EBD</span>
+        </div>
+    </div>
+    
+    <div class="main-title-area">
+        <h1>EBD &mdash; <span class="gold-underline">PRIORIDADE</span><br>OU OPÇÃO?</h1>
+        <p class="main-subtitle">Conscientização Espiritual, Comportamental e Bíblica</p>
+        <p class="main-sub-subtitle"><span class="gold-pipe">|</span> Crescimento espiritual não acontece por acaso</p>
+    </div>
+
+    <div class="graphic-cross-container">
+        <div class="cross"></div>
+    </div>
+
+    <div class="modern-quote-box absolute-bottom">
+        <p>"Um domingo dedicado ao aprendizado da Palavra constrói alicerces inabaláveis para toda a vida."</p>
+        <cite>O poder transformador da Escola Bíblica</cite>
+    </div>
+</div>
+
+<!-- COMMON HEADER FOR INNER SLIDES -->
+<!-- Slide 2 -->
+<div class="slide-container" id="slide2">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+    
+    <h2 class="slide-title" style="margin-top: 60px;">Todos sabem...</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <ul>
+                    <li>Que precisam <strong>ler a Bíblia</strong>.</li>
+                    <li>Que precisam <strong>orar</strong>.</li>
+                    <li>Que precisam <strong>crescer espiritualmente</strong>.</li>
+                </ul>
+                <div class="emphasis-box">
+                    <h3 class="gold-text">Então por que não fazem?</h3>
+                </div>
+            </div>
+            <div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1504052434569-70ad5836ab65?q=80&w=800&auto=format&fit=crop" alt="Bíblia iluminada">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 3 -->
+<div class="slide-container" id="slide3">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">Nossa Realidade</h2>
+    <div class="content-area">
+        <div class="two-column highlight-numbers-layout">
+            <div>
+                <div class="number">50</div>
+                <div class="number-label">Alunos assíduos na EBD<br>(de 170 a 180 membros)</div>
+            </div>
+            <div>
+                <h3>Onde está a falha?</h3>
+                <p>Uma grande parcela da igreja não está recebendo o fundamento necessário para uma vida cristã sólida.</p>
+                <div class="emphasis-box" style="margin-top: 20px; padding: 20px;">
+                    <p class="highlight-text">O conhecimento bíblico deixou de ser prioridade?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 4 -->
+<div class="slide-container" id="slide4">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">O problema não é falta de informação</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <p>As pessoas sabem o que fazer... Mas não conseguem transformar conhecimento em prática.</p>
+                <p>A psicologia chama isso de <strong style="color: var(--color-text-white);">Dissonância Cognitiva</strong>:</p>
+                <ul>
+                    <li>A pessoa sabe o que é certo.</li>
+                    <li>Mas vive diferente disso.</li>
+                </ul>
+                <p style="margin-top: 20px;">Então, cria justificativas para aliviar a culpa:</p>
+                <ul style="color: var(--color-text-muted); font-style: italic; opacity: 0.8;">
+                    <li>"Estou muito cansado hoje."</li>
+                    <li>"Depois eu vou, tenho muito tempo."</li>
+                    <li>"Deus entende meu coração e rotina."</li>
+                </ul>
+            </div>
+            <div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1512314889357-e157c22f938d?q=80&w=800&auto=format&fit=crop" alt="Distração e tecnologia">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5 -->
+<div class="slide-container" id="slide5">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">Por que as pessoas não fazem?</h2>
+    <div class="content-area" style="align-items: flex-start;">
+        <div class="bullet-list" style="max-width: 900px;">
+            <ul>
+                <li><i class="fa-solid fa-calendar-xmark"></i> <strong>Falta de hábito:</strong> Vivem por emoção, não por disciplina. Quando a motivação acaba, a prática cessa.</li>
+                <li><i class="fa-solid fa-mobile-screen"></i> <strong>Recompensa imediata:</strong> O celular entretém e recompensa agora. A Palavra transforma a longo prazo.</li>
+                <li><i class="fa-solid fa-list-ol"></i> <strong>Falta de prioridade:</strong> Tudo vem antes da vida espiritual: trabalho, lazer, descanso, família.</li>
+                <li><i class="fa-solid fa-users-slash"></i> <strong>Falta de ambiente:</strong> A influência social pesa. Se ninguém do círculo próximo vai, a pessoa também não vai.</li>
+                <li><i class="fa-solid fa-clock-rotate-left"></i> <strong>Falta de urgência:</strong> A perigosa ilusão do "Depois eu começo..." ou "Mês que vem eu me firmo."</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 6 -->
+<div class="slide-container bleed-image-layout" id="slide6">
+    <div class="content-container">
+        <div class="badge-left" style="align-self: flex-start; margin-bottom: 40px;">Escola Bíblica Dominical</div>
+        <h2 class="slide-title" style="margin-bottom: 20px;">O Perigo da Nossa Geração</h2>
+        <div class="content-area" style="align-items: flex-start;">
+            <div class="bleed-text-side">
+                <h3>Relativismo Moral</h3>
+                <p>Vivemos em uma época onde as verdades absolutas são constantemente questionadas e desconstruídas.</p>
+                <p>Hoje muitos acreditam:</p>
+                <ul style="color: var(--color-text-white); font-size: 20px; line-height: 1.6; margin-bottom: 25px; margin-left: 20px;">
+                    <li>"Cada um tem sua verdade."</li>
+                    <li>"Cada um serve a Deus do seu próprio jeito."</li>
+                    <li>"Não existe um certo absoluto."</li>
+                </ul>
+                <div class="emphasis-box" style="margin-top: 0; padding: 20px;">
+                    <p class="highlight-text" style="color: #ef4444;">O perigo é que isso entrou sutilmente nas igrejas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="image-container">
+        <img class="bleed-image-side" src="https://images.unsplash.com/photo-1476304884326-cd2c88572c5f?q=80&w=1000&auto=format&fit=crop" alt="Múltiplos caminhos, relativismo">
+    </div>
+</div>
+
+<!-- Slide 7 -->
+<div class="slide-container" id="slide7">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">Consequência do Relativismo</h2>
+    <p style="font-size: 22px; margin-bottom: 40px; text-align: left; width: 100%;">Quando não existe uma verdade absoluta que norteia a vida:</p>
+    
+    <div class="content-area">
+        <div class="tiled-content">
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-clipboard-list"></i></div>
+                <h3>A Disciplina</h3>
+                <p>Deixa de ser um dever espiritual e <strong style="color: var(--color-text-white);">vira opção</strong> de acordo com a conveniência.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-heart-pulse"></i></div>
+                <h3>O Compromisso</h3>
+                <p>Deixa de ser um pacto firme e <strong style="color: var(--color-text-white);">vira emoção</strong>, dependendo de como a pessoa se sente no dia.</p>
+            </div>
+            <div class="tile">
+                <div class="icon"><i class="fa-solid fa-comments"></i></div>
+                <h3>A Obediência</h3>
+                <p>Deixa de ser submissão à Palavra e <strong style="color: var(--color-text-white);">vira opinião</strong>, onde cada um interpreta o que quer.</p>
+            </div>
+        </div>
+    </div>
+    <p style="font-size: 22px; color: var(--color-gold); font-weight: 600; margin-top: 40px; width: 100%; text-align: center;">Resultado: A vida espiritual perde completamente o fundamento.</p>
+</div>
+
+<!-- Slide 8 -->
+<div class="slide-container bleed-image-layout" id="slide8">
+    <div class="content-container">
+        <div class="badge-left" style="align-self: flex-start; margin-bottom: 40px;">Escola Bíblica Dominical</div>
+        <h2 class="slide-title" style="margin-bottom: 20px;">Prioridades Invertidas</h2>
+        <div class="content-area" style="align-items: flex-start;">
+            <div class="bleed-text-side">
+                <h3>O Livro de Ageu 1</h3>
+                <p>O povo de Deus dizia:</p>
+                <div class="emphasis-box" style="margin: 10px 0 25px 0; padding: 15px 20px;">
+                    <p style="font-style: italic; color: var(--color-text-white); margin: 0;">"Assim diz o Senhor dos Exércitos: Este povo afirma: 'Ainda não chegou o tempo de reconstruir a casa do Senhor'." <br><span style="font-size: 16px; color: var(--color-gold); font-style: normal; display: inline-block; margin-top: 10px;">— Ageu 1:2</span></p>
+                </div>
+                <p>Mas, na verdade, eles estavam:</p>
+                <ul style="color: var(--color-text-white); font-size: 20px; line-height: 1.6; margin-bottom: 25px; margin-left: 20px;">
+                    <li>Construindo suas próprias casas.</li>
+                    <li>Cuidando apenas de seus interesses pessoais.</li>
+                    <li>Vivendo focados no próprio conforto.</li>
+                </ul>
+                <p style="font-weight: 600; color: var(--color-gold);">Enquanto isso, o templo permanecia em ruínas.</p>
+            </div>
+        </div>
+    </div>
+    <div class="image-container">
+        <img class="bleed-image-side" src="https://images.unsplash.com/photo-1501139083538-0139583c060f?q=80&w=1000&auto=format&fit=crop" alt="Tempo e prioridades">
+    </div>
+</div>
+
+<!-- Slide 9 (Quote Slide) -->
+<div class="slide-container" id="slide9">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <div class="content-area">
+        <div class="modern-quote-box" style="padding: 50px 60px; max-width: 900px;">
+            <p style="font-size: 40px; line-height: 1.3; margin-bottom: 25px;">"É tempo de habitardes vós em casas apaineladas, enquanto esta casa permanece em ruínas?"</p>
+            <cite>A Mensagem de Ageu</cite>
+        </div>
+        <p style="margin-top: 40px; font-size: 24px; color: var(--color-text-muted);">O problema não era falta de tempo. <strong style="color: var(--color-gold);">Era falta de prioridade.</strong></p>
+    </div>
+</div>
+
+<!-- Slide 10 -->
+<div class="slide-container" id="slide10">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">Aplicação para Hoje</h2>
+    <div class="content-area">
+        <div style="width: 100%; max-width: 1000px;">
+            <p style="font-size: 24px; margin-bottom: 40px;">Hoje muitos não abandonaram a igreja fisicamente, mas na prática diária:</p>
+            <div class="bullet-list">
+                <ul>
+                    <li><i class="fa-solid fa-book-bible"></i> Deixaram a <strong>Bíblia</strong> por último.</li>
+                    <li><i class="fa-solid fa-person-praying"></i> Deixaram a <strong>oração</strong> por último.</li>
+                    <li><i class="fa-solid fa-school"></i> Deixaram a <strong>Escola Bíblica Dominical</strong> por último.</li>
+                </ul>
+            </div>
+            <div class="modern-quote-box" style="margin-top: 40px; text-align: center; border-left: none; border-top: 4px solid var(--color-gold); border-radius: 0 0 8px 8px;">
+                <p style="color: var(--color-text-white); font-size: 28px; font-style: normal; margin: 0;">
+                    Tudo virou prioridade.<br><span style="color: var(--color-gold); font-weight: 700;">Menos o crescimento espiritual.</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 11 -->
+<div class="slide-container" id="slide11">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">O Propósito da EBD</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <p style="font-size: 24px; font-weight: 600; color: var(--color-gold); margin-bottom: 30px;">A EBD não é um evento. É construção espiritual.</p>
+                <p>Na Escola Bíblica Dominical nós aprendemos:</p>
+                <ul>
+                    <li><strong>Doutrina:</strong> O que cremos e por que cremos.</li>
+                    <li><strong>Bíblia:</strong> O conhecimento profundo da Palavra.</li>
+                    <li><strong>Maturidade:</strong> Deixar de ser criança na fé.</li>
+                    <li><strong>Discernimento:</strong> Saber separar o certo do errado.</li>
+                    <li><strong>Fundamento:</strong> Raízes para suportar as tempestades.</li>
+                </ul>
+            </div>
+            <div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=800&auto=format&fit=crop" alt="Raízes e fundamento">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 12 -->
+<div class="slide-container" id="slide12">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">O que acontece sem fundamento?</h2>
+    <div class="content-area">
+        <div class="two-column tiled">
+            <div>
+                <h3>1. Vulnerável</h3>
+                <p>O crente fica desprotegido contra falsos ensinos, modismos teológicos e ataques diretos à sua fé. Qualquer vento o derruba.</p>
+            </div>
+            <div>
+                <h3>2. Emocionalmente Instável</h3>
+                <p>A vida espiritual passa a depender do humor e das circunstâncias. Sem raízes profundas, a crise gera desespero imediato.</p>
+            </div>
+            <div>
+                <h3>3. Sem Discernimento</h3>
+                <p>Incapacidade de avaliar situações, escolhas e filosofias de vida pela lente das Escrituras Sagradas.</p>
+            </div>
+            <div>
+                <h3>4. Facilmente Influenciado</h3>
+                <p>Sem convicções próprias baseadas na Palavra, o cristão é levado pela cultura, opiniões e comportamento do mundo.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 13 (Quote Slide) -->
+<div class="slide-container" id="slide13">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <div class="content-area">
+        <div class="modern-quote-box" style="padding: 50px 60px; max-width: 800px;">
+            <p style="font-size: 44px; line-height: 1.3; margin-bottom: 25px;">"O meu povo perece por falta de conhecimento."</p>
+            <cite>Oséias 4:6</cite>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 14 -->
+<div class="slide-container" id="slide14">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">Verdade Direta</h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div>
+                <p style="font-size: 24px; color: var(--color-text-white); font-weight: 600; margin-bottom: 25px;">As pessoas não fazem o que é importante.</p>
+                <p>Na grande maioria das vezes, elas fazem o que é:</p>
+                <ul style="margin-bottom: 30px;">
+                    <li><strong>Fácil:</strong> que não exige esforço.</li>
+                    <li><strong>Automático:</strong> o que a rotina já dita.</li>
+                    <li><strong>Confortável:</strong> o que não gera desgaste.</li>
+                    <li><strong>Efeito manada:</strong> aquilo que todos fazem.</li>
+                </ul>
+                <div class="emphasis-box" style="margin-top: 0; padding: 20px;">
+                    <p class="highlight-text gold-text">Crescer espiritualmente exige ir contra essa correnteza de comodismo.</p>
+                </div>
+            </div>
+            <div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1476820865390-c52aeebb9891?q=80&w=800&auto=format&fit=crop" alt="Caminho diferente da multidão">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 15 -->
+<div class="slide-container" id="slide15">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <h2 class="slide-title" style="margin-top: 60px;">A Decisão</h2>
+    <div class="content-area">
+        <div style="width: 100%; max-width: 900px;">
+            <p style="font-size: 26px; color: var(--color-text-white); margin-bottom: 40px;">Crescimento espiritual exige atitude:</p>
+            <div class="bullet-list" style="margin-bottom: 50px;">
+                <ul>
+                    <li><i class="fa-solid fa-check"></i> <strong>Decisão:</strong> Escolher o que é certo, mesmo quando não dá vontade.</li>
+                    <li><i class="fa-solid fa-star"></i> <strong>Prioridade:</strong> Colocar o Reino de Deus em primeiro lugar.</li>
+                    <li><i class="fa-solid fa-arrow-rotate-right"></i> <strong>Constância:</strong> Fazer o que precisa ser feito repetidas vezes.</li>
+                    <li><i class="fa-solid fa-shield-halved"></i> <strong>Disciplina:</strong> Submeter a carne ao propósito do espírito.</li>
+                </ul>
+            </div>
+            <div class="modern-quote-box" style="text-align: center; border-left: none; border-top: 4px solid var(--color-gold); border-radius: 0 0 8px 8px; padding: 20px;">
+                <p style="color: var(--color-text-white); font-size: 24px; font-style: normal; font-weight: 600; margin: 0;">
+                    Quem decide, organiza. Quem não decide, vive de desculpas.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 16 -->
+<div class="slide-container" id="slide16">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <div class="content-area" style="text-align: center;">
+        <h2 style="font-size: 48px; color: var(--color-gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 40px;">Chamada Final</h2>
+        <p style="font-size: 32px; color: var(--color-text-muted); margin-bottom: 15px;">A EBD não é uma obrigação religiosa.</p>
+        <p style="font-size: 36px; font-weight: 700; color: var(--color-text-white);">É investimento espiritual eterno.</p>
+    </div>
+</div>
+
+<!-- Slide 17 (Quote Slide) -->
+<div class="slide-container" id="slide17">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <div class="content-area">
+        <div class="modern-quote-box" style="padding: 50px 60px; max-width: 950px;">
+            <p style="font-size: 36px; line-height: 1.4; margin-bottom: 25px;">"A diferença entre o crente que cresce e o que permanece parado não é o quanto ele sabe... é o quanto ele pratica."</p>
+            <cite>Decida Praticar</cite>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 18 (Final Slide) -->
+<div class="slide-container" id="slide18">
+    <div class="slide-header-absolute" style="top: 40px; left: 60px;">
+        <div class="badge-left">Escola Bíblica Dominical</div>
+    </div>
+
+    <div class="qa-layout">
+        <h2 style="font-family: var(--font-serif); color: var(--color-gold);">Hoje é dia de decisão.</h2>
+        <p>Você quer crescer?</p>
+        <p>Você quer se aprofundar?</p>
+        <p>Você quer fortalecer sua vida espiritual?</p>
+        <div class="contact-info">
+            Faça parte da EBD
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
